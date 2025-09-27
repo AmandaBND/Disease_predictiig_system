@@ -18,16 +18,14 @@ print("Original shape:", df.shape)
 # -------------------------------
 # 1. Drop unwanted columns
 # -------------------------------
-KEEP_COLS = [
-    "Age", "Gender", "Ethnicity", "Family_History", "Smoking", "Alcohol",
-    "Diet_Habits", "Physical_Activity",
-    "Symptom_Cough", "Symptom_Fever", "Symptom_ChestPain", "Symptom_Fatigue",
-    "Special_Symptom_1", "Special_Symptom_2", "Special_Symptom_3",
-    "Duration_Days", "Current_Medications", "Pre_existing_Conditions",
-    "BMI_Category",  # computed in app, but may exist in dataset
-    "Disease"
+DROP_COLS = [
+    "Record_ID", "Record_Date", "Living_Area",
+    "Risk_Score", "risr score", "Risk_Score_0_10",
+    "Severity_Cat", "Specialist",
+    "Symptom_Severity", "Symptom_Duration", "Total_Symptoms"  # <- DROPPED
 ]
-df = df[[col for col in KEEP_COLS if col in df.columns]]
+
+df = df.drop(columns=[c for c in DROP_COLS if c in df.columns], errors="ignore")
 
 # -------------------------------
 # 2. Remove duplicates
@@ -65,5 +63,5 @@ for col in ["Special_Symptom_1", "Special_Symptom_2", "Special_Symptom_3",
 Path("Preprocess").mkdir(parents=True, exist_ok=True)
 df.to_csv(OUTPUT_PATH, index=False)
 
-print(f"✅ Cleaned dataset saved to {OUTPUT_PATH}")
-print("📊 Final shape:", df.shape)
+print(f" Cleaned dataset saved to {OUTPUT_PATH}")
+print(" Final shape:", df.shape)
