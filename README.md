@@ -5,7 +5,7 @@ based on patient demographics, lifestyle, and symptoms.
 
 ##  Project Structure
 
-## 🚀 Run Locally
+##  Run Locally
 ```bash
 # 1. Install dependencies
 pip install -r requirements.txt

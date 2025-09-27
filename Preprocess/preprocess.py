@@ -18,12 +18,16 @@ print("Original shape:", df.shape)
 # -------------------------------
 # 1. Drop unwanted columns
 # -------------------------------
-DROP_COLS = [
-    "Record_ID", "Record_Date", "Living_Area",
-    "Risk_Score", "risr score", "Risk_Score_0_10",
-    "Severity_Cat", "Specialist"
+KEEP_COLS = [
+    "Age", "Gender", "Ethnicity", "Family_History", "Smoking", "Alcohol",
+    "Diet_Habits", "Physical_Activity",
+    "Symptom_Cough", "Symptom_Fever", "Symptom_ChestPain", "Symptom_Fatigue",
+    "Special_Symptom_1", "Special_Symptom_2", "Special_Symptom_3",
+    "Duration_Days", "Current_Medications", "Pre_existing_Conditions",
+    "BMI_Category",  # computed in app, but may exist in dataset
+    "Disease"
 ]
-df = df.drop(columns=[c for c in DROP_COLS if c in df.columns], errors="ignore")
+df = df[[col for col in KEEP_COLS if col in df.columns]]
 
 # -------------------------------
 # 2. Remove duplicates
@@ -35,35 +39,25 @@ print("After dropping duplicates:", df.shape)
 # 3. Handle outliers
 # -------------------------------
 if "Age" in df.columns:
-    df["Age"] = pd.to_numeric(df["Age"], errors="coerce").clip(0, 100)
+    df["Age"] = pd.to_numeric(df["Age"], errors="coerce").clip(0, 120)
 
 if "Duration_Days" in df.columns:
     df["Duration_Days"] = pd.to_numeric(df["Duration_Days"], errors="coerce")
     df.loc[df["Duration_Days"] < 0, "Duration_Days"] = np.nan
 
 # -------------------------------
-# 4. Normalize categorical typos
+# 4. Normalize text columns
 # -------------------------------
-if "Diet_Habits" in df.columns:
-    df["Diet_Habits"] = (
-        df["Diet_Habits"].astype(str)
-        .str.strip()
-        .str.title()
-        .replace({"Processd Food": "Processed Food"})
-    )
-
 if "Gender" in df.columns:
     df["Gender"] = df["Gender"].astype(str).str.strip().str.capitalize()
 
-for col in ["Special_Symptom_1", "Special_Symptom_2", "Special_Symptom_3"]:
+if "Diet_Habits" in df.columns:
+    df["Diet_Habits"] = df["Diet_Habits"].astype(str).str.strip().str.title()
+
+for col in ["Special_Symptom_1", "Special_Symptom_2", "Special_Symptom_3",
+            "Current_Medications", "Pre_existing_Conditions"]:
     if col in df.columns:
-        df[col] = (
-            df[col].astype(str)
-            .str.strip()
-            .str.replace(r"\s+", " ", regex=True)
-            .str.title()
-        )
-        df.loc[df[col].isin(["Nan", "None", ""]), col] = np.nan
+        df[col] = df[col].astype(str).str.strip().replace(["nan", "NaN", ""], np.nan)
 
 # -------------------------------
 # Save cleaned dataset
@@ -71,5 +65,5 @@ for col in ["Special_Symptom_1", "Special_Symptom_2", "Special_Symptom_3"]:
 Path("Preprocess").mkdir(parents=True, exist_ok=True)
 df.to_csv(OUTPUT_PATH, index=False)
 
-print(f" Cleaned dataset saved to {OUTPUT_PATH}")
-print(" Final shape:", df.shape)
+print(f"✅ Cleaned dataset saved to {OUTPUT_PATH}")
+print("📊 Final shape:", df.shape)
