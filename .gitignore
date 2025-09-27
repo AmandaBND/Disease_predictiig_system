@@ -19,6 +19,4 @@ Thumbs.db
 
 # Models & datasets (large files - optional)
 *.joblib
-*.csv
-data/
-Data/
+
