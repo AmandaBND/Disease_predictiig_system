@@ -19,7 +19,7 @@ python Train/train.py
 # 4. Launch Streamlit app
 streamlit run UI/app.py
 
-# System Diagram
+#System Diagram
               ┌─────────────────────────┐
               │  Preprocessed Dataset   │
               │ processed_dataset.csv   │
