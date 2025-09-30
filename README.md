@@ -3,6 +3,23 @@
 A machine learning project to predict diseases (Asthma, Hypertension, Obesity, Influenza, Diabetes, Heart Disease) 
 based on patient demographics, lifestyle, and symptoms.
 
+
+## 🧹 Data Preprocessing Techniques
+
+- Dropped irrelevant columns (IDs, metadata, risk scores).
+- Removed duplicate rows to avoid bias.
+- Clipped unrealistic values:
+  - Age → [0, 120]
+  - Negative duration → NaN
+- Normalized categorical values:
+  - Gender standardized (Male/Female)
+  - Diet habits capitalized (Vegetarian/Non-Vegetarian)
+- Cleaned text fields (replaced "nan"/"NaN"/empty → NaN).
+- Converted BMI category → numeric BMI value.
+- Saved cleaned dataset for model training.
+
+
+
 # System Diagram
 
               ┌─────────────────────────┐
