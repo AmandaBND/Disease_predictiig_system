@@ -68,10 +68,10 @@ based on patient demographics, lifestyle, and symptoms.
                          │
          ┌───────────────┴───────────────┐
          ▼                               ▼
-   ┌─────────────┐                ┌─────────────┐
+                   
    │ Best Model? │── Yes ─────────▶ Save Model  │
-   └─────────────┘                │ best_model.joblib │
-                                   └─────────────┘
+                                  best_model.joblib 
+                                   
 
 
 ##  Project Structure
