@@ -20,3 +20,13 @@ Thumbs.db
 # Models & datasets (large files - optional)
 *.joblib
 
+
+# Temporary files
+diff_output.txt
+commit_message.txt
+.gitignore
+AGENTS.md
+QUICK_WINS.md
+ui improvement plan.md
+Docs/
+run_app.bat

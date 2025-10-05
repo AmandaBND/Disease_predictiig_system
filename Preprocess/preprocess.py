@@ -57,6 +57,24 @@ for col in ["Special_Symptom_1", "Special_Symptom_2", "Special_Symptom_3",
     if col in df.columns:
         df[col] = df[col].astype(str).str.strip().replace(["nan", "NaN", ""], np.nan)
 
+# 5. Convert BMI_Category to numeric BMI_Value
+
+if "BMI_Category" in df.columns:
+    def assign_bmi_value(cat):
+        if cat == "Underweight":
+            return np.random.uniform(15, 18.4)
+        elif cat == "Normal":
+            return np.random.uniform(18.5, 24.9)
+        elif cat == "Overweight":
+            return np.random.uniform(25, 29.9)
+        elif cat == "Obese":
+            return np.random.uniform(30, 40)
+        return np.nan
+
+    df["BMI_Value"] = df["BMI_Category"].apply(assign_bmi_value)
+    df = df.drop(columns=["BMI_Category"])
+
+
 # -------------------------------
 # Save cleaned dataset
 # -------------------------------

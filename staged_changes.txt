@@ -1,0 +1,719 @@
+diff --git a/.gitignore b/.gitignore
+index 3eef531..4947441 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -20,3 +20,13 @@ Thumbs.db
+ # Models & datasets (large files - optional)
+ *.joblib
+ 
++
++# Temporary files
++diff_output.txt
++commit_message.txt
++.gitignore
++AGENTS.md
++QUICK_WINS.md
++ui improvement plan.md
++Docs/
++run_app.bat
+\ No newline at end of file
+diff --git a/UI/app.py b/UI/app.py
+index 288bcc4..ff18c45 100644
+--- a/UI/app.py
++++ b/UI/app.py
+@@ -14,7 +14,127 @@ ENCODER_PATH = os.path.join("Train", "label_encoder.joblib")
+ model = joblib.load(MODEL_PATH)
+ label_encoder = joblib.load(ENCODER_PATH)
+ 
+-st.set_page_config(page_title="Disease Prediction System", page_icon="🩺")
++st.set_page_config(page_title="Disease Prediction System", page_icon="🩺", layout="wide")
++
++st.markdown("""
++<style>
++    .main {
++        background: #ffffff;
++    }
++    .stApp {
++        background: linear-gradient(135deg, #e8f4f8 0%, #f0f8ff 100%);
++    }
++    .stButton>button {
++        background: linear-gradient(90deg, #0077b6 0%, #023e8a 100%);
++        color: white;
++        font-weight: bold;
++        font-size: 16px;
++        border-radius: 10px;
++        padding: 12px 30px;
++        border: none;
++        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
++        transition: all 0.3s ease;
++    }
++    .stButton>button:hover {
++        box-shadow: 0 6px 16px rgba(0,0,0,0.3);
++        transform: translateY(-2px);
++        background: linear-gradient(90deg, #023e8a 0%, #0077b6 100%);
++    }
++    .prediction-card {
++        background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
++        padding: 25px;
++        border-radius: 15px;
++        color: white;
++        box-shadow: 0 8px 20px rgba(0,0,0,0.25);
++        margin: 20px 0;
++        font-size: 18px;
++    }
++    .success-card {
++        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
++        padding: 25px;
++        border-radius: 15px;
++        color: white;
++        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
++        margin: 15px 0;
++        font-size: 20px;
++    }
++    .info-card {
++        background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
++        padding: 25px;
++        border-radius: 15px;
++        color: white;
++        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
++        margin: 15px 0;
++        font-size: 18px;
++    }
++    .section-header {
++        background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
++        color: white;
++        font-size: 22px;
++        font-weight: bold;
++        margin-top: 25px;
++        margin-bottom: 20px;
++        padding: 12px 20px;
++        border-radius: 8px;
++        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
++    }
++    .bmi-normal {
++        background: #16a34a;
++        padding: 12px 24px;
++        border-radius: 10px;
++        color: white;
++        font-weight: bold;
++        font-size: 18px;
++        display: inline-block;
++        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
++    }
++    .bmi-underweight {
++        background: #ea580c;
++        padding: 12px 24px;
++        border-radius: 10px;
++        color: white;
++        font-weight: bold;
++        font-size: 18px;
++        display: inline-block;
++        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
++    }
++    .bmi-overweight {
++        background: #d97706;
++        padding: 12px 24px;
++        border-radius: 10px;
++        color: white;
++        font-weight: bold;
++        font-size: 18px;
++        display: inline-block;
++        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
++    }
++    .bmi-obese {
++        background: #dc2626;
++        padding: 12px 24px;
++        border-radius: 10px;
++        color: white;
++        font-weight: bold;
++        font-size: 18px;
++        display: inline-block;
++        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
++    }
++    h1 {
++        color: #1e3a8a;
++        font-weight: 800;
++        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
++    }
++    label, .stMarkdown, p {
++        color: #1f2937 !important;
++        font-weight: 500;
++    }
++    .stSelectbox label, .stNumberInput label, .stRadio label, .stMultiSelect label, .stTextInput label {
++        color: #111827 !important;
++        font-weight: 600;
++        font-size: 15px;
++    }
++</style>
++""", unsafe_allow_html=True)
++
+ st.title("🩺 Disease Prediction System")
+ st.write("Fill in patient details to predict possible disease and get specialist recommendation.")
+ 
+@@ -22,47 +142,61 @@ st.write("Fill in patient details to predict possible disease and get specialist
+ # User Inputs
+ # -------------------------------
+ 
+-# Age with real-world limits
+-age = st.number_input("Age", min_value=0, max_value=120, step=1)
+-
+-gender = st.radio("Gender", ["Male", "Female"])
+-
+-ethnicity = st.selectbox("Ethnicity", ["Caucasian", "Asian", "African American", "Hispanic", "Other"])
++st.markdown('<div class="section-header">👤 Demographics</div>', unsafe_allow_html=True)
++col1, col2, col3 = st.columns(3)
++with col1:
++    age = st.number_input("Age", min_value=0, max_value=120, step=1)
++with col2:
++    gender = st.radio("Gender", ["Male", "Female"])
++with col3:
++    ethnicity = st.selectbox("Ethnicity", ["Caucasian", "Asian", "African American", "Hispanic", "Other"])
+ 
+-family_history = st.selectbox("Family History of Disease", ["Yes", "No"])
++col1, col2 = st.columns(2)
++with col1:
++    family_history = st.selectbox("Family History of Disease", ["Yes", "No"])
++with col2:
++    st.write("")
+ 
+-smoking = st.selectbox("Smoking Habit", ["No", "Occasional", "Daily"])
++st.markdown('<div class="section-header">🚬 Lifestyle Factors</div>', unsafe_allow_html=True)
++col1, col2, col3, col4 = st.columns(4)
++with col1:
++    smoking = st.selectbox("Smoking Habit", ["No", "Occasional", "Daily"])
++with col2:
++    alcohol = st.selectbox("Alcohol Consumption", ["No", "Social", "Frequent"])
++with col3:
++    diet = st.selectbox("Diet Habits", ["Healthy", "Processed Food", "High Sugar", "Balanced"])
++with col4:
++    activity = st.selectbox("Physical Activity", ["Low", "Moderate", "High"])
+ 
+-alcohol = st.selectbox("Alcohol Consumption", ["No", "Social", "Frequent"])
+-
+-diet = st.selectbox("Diet Habits", ["Healthy", "Processed Food", "High Sugar", "Balanced"])
+-
+-activity = st.selectbox("Physical Activity", ["Low", "Moderate", "High"])
+-
+-# Height & Weight for BMI calculation
+-height = st.number_input("Height (cm)", min_value=50, max_value=250, step=1)
+-weight = st.number_input("Weight (kg)", min_value=10, max_value=300, step=1)
++st.markdown('<div class="section-header">📏 Physical Measurements</div>', unsafe_allow_html=True)
++col1, col2 = st.columns(2)
++with col1:
++    height = st.number_input("Height (cm)", min_value=50, max_value=250, step=1)
++with col2:
++    weight = st.number_input("Weight (kg)", min_value=10, max_value=300, step=1)
+ 
+ bmi_category = None
+ if height > 0 and weight > 0:
+     bmi = weight / ((height / 100) ** 2)
+     if bmi < 18.5:
+         bmi_category = "Underweight"
++        st.markdown(f'<div class="bmi-underweight">BMI: {bmi:.2f} → {bmi_category}</div>', unsafe_allow_html=True)
+     elif 18.5 <= bmi < 25:
+         bmi_category = "Normal"
++        st.markdown(f'<div class="bmi-normal">BMI: {bmi:.2f} → {bmi_category}</div>', unsafe_allow_html=True)
+     elif 25 <= bmi < 30:
+         bmi_category = "Overweight"
++        st.markdown(f'<div class="bmi-overweight">BMI: {bmi:.2f} → {bmi_category}</div>', unsafe_allow_html=True)
+     else:
+         bmi_category = "Obese"
+-    st.write(f"**BMI:** {bmi:.2f} → {bmi_category}")
++        st.markdown(f'<div class="bmi-obese">BMI: {bmi:.2f} → {bmi_category}</div>', unsafe_allow_html=True)
+ 
+-# Generic Symptoms
++st.markdown('<div class="section-header">🩺 Symptoms</div>', unsafe_allow_html=True)
+ symptoms = st.multiselect(
+     "Select Symptoms",
+     ["Cough", "Fever", "Chest Pain", "Fatigue"]
+ )
+ 
+-# Special Symptoms (multiple selection)
+ special_symptoms = st.multiselect(
+     "Special Symptoms (optional)",
+     [
+@@ -78,10 +212,16 @@ special_symptom1 = special_symptoms[0] if len(special_symptoms) > 0 else np.nan
+ special_symptom2 = special_symptoms[1] if len(special_symptoms) > 1 else np.nan
+ special_symptom3 = special_symptoms[2] if len(special_symptoms) > 2 else np.nan
+ 
+-# Extra fields
+-duration_days = st.number_input("Symptom Duration (days)", min_value=0, max_value=365, step=1)
+-current_medications = st.text_input("Current Medications (optional)")
+-pre_existing_conditions = st.text_input("Pre-existing Conditions (optional)")
++col1, col2 = st.columns(2)
++with col1:
++    duration_days = st.number_input("Symptom Duration (days)", min_value=0, max_value=365, step=1)
++with col2:
++    st.write("")
++
++st.markdown('<div class="section-header">📋 Medical History</div>', unsafe_allow_html=True)
++with st.expander("Additional Information (Optional)"):
++    current_medications = st.text_input("Current Medications (optional)")
++    pre_existing_conditions = st.text_input("Pre-existing Conditions (optional)")
+ 
+ # -------------------------------
+ # Build input dataframe
+@@ -113,32 +253,59 @@ df_input = pd.DataFrame(input_dict)
+ # -------------------------------
+ # Prediction
+ # -------------------------------
++st.markdown('<div class="section-header">🔮 Prediction</div>', unsafe_allow_html=True)
+ if st.button("🔮 Predict Disease"):
+-    try:
+-        prediction = model.predict(df_input)[0]
+-
+-        # Decode numeric prediction back to label
+-        if isinstance(prediction, (int, np.integer)):
+-            prediction = label_encoder.inverse_transform([prediction])[0]
+-
+-        st.success(f"Predicted Disease: **{prediction}**")
+-
+-        if hasattr(model, "predict_proba"):
+-            probs = model.predict_proba(df_input)[0]
+-            confidence = round(max(probs) * 100, 2)
+-            st.write(f"Prediction Confidence: {confidence}%")
+-
+-        # Specialist mapping
+-        mapping = {
+-            "Asthma": "Pulmonologist",
+-            "Hypertension": "Cardiologist",
+-            "Obesity": "Nutritionist",
+-            "Influenza": "General Practitioner",
+-            "Diabetes": "Endocrinologist",
+-            "Heart Disease": "Cardiologist"
+-        }
+-        specialist = mapping.get(prediction, "General Doctor")
+-        st.info(f"Recommended Specialist: **{specialist}**")
+-
+-    except Exception as e:
+-        st.error(f"⚠️ Prediction failed: {e}")
++    with st.spinner("Analyzing patient data..."):
++        try:
++            prediction = model.predict(df_input)[0]
++
++            if isinstance(prediction, (int, np.integer)):
++                prediction = label_encoder.inverse_transform([prediction])[0]
++
++            st.markdown(f'<div class="success-card"><h2 style="margin:0;">Predicted Disease: {prediction}</h2></div>', unsafe_allow_html=True)
++
++            if hasattr(model, "predict_proba"):
++                probs = model.predict_proba(df_input)[0]
++                confidence = round(max(probs) * 100, 2)
++                
++                st.markdown(f'<div class="prediction-card"><h3 style="margin:0;">Confidence Level: {confidence}%</h3></div>', unsafe_allow_html=True)
++                st.progress(confidence / 100)
++
++                disease_names = label_encoder.classes_
++                prob_df = pd.DataFrame({
++                    "Disease": disease_names,
++                    "Probability (%)": [round(p * 100, 2) for p in probs]
++                }).sort_values("Probability (%)", ascending=False)
++
++                st.markdown("### 📊 All Disease Probabilities")
++                st.bar_chart(prob_df.set_index("Disease"))
++                
++                with st.expander("View Detailed Probabilities"):
++                    st.dataframe(prob_df, use_container_width=True)
++
++            mapping = {
++                "Asthma": "Pulmonologist",
++                "Hypertension": "Cardiologist",
++                "Obesity": "Nutritionist",
++                "Influenza": "General Practitioner",
++                "Diabetes": "Endocrinologist",
++                "Heart Disease": "Cardiologist"
++            }
++            specialist = mapping.get(prediction, "General Doctor")
++            
++            specialist_icons = {
++                "Pulmonologist": "🫁",
++                "Cardiologist": "❤️",
++                "Nutritionist": "🥗",
++                "General Practitioner": "👨‍⚕️",
++                "Endocrinologist": "💉",
++                "General Doctor": "🩺"
++            }
++            icon = specialist_icons.get(specialist, "🩺")
++            
++            st.markdown(f'<div class="info-card"><h3 style="margin:0;">{icon} Recommended Specialist: {specialist}</h3></div>', unsafe_allow_html=True)
++            
++            st.balloons()
++
++        except Exception as e:
++            st.error(f"⚠️ Prediction failed: {e}")
+diff --git a/alignment.md b/alignment.md
+new file mode 100644
+index 0000000..bc9a9b9
+--- /dev/null
++++ b/alignment.md
+@@ -0,0 +1,370 @@
++# Project Alignment Analysis
++
++## Overview
++This document analyzes how the Disease Prediction System aligns with the guidance and requirements provided in the FDM Mini Project instructions and marking rubric.
++
++---
++
++## 1. Problem Definition, Business Goals & Data Mining Functionality [20%]
++
++### Requirements (from Marking Grid)
++- Business goals and functionalities clearly identified and explained in detail
++- Justification of model selection with comparison to alternatives
++- Alternative solutions with appropriate explanations
++
++### Current Project Status
++
++#### ✅ Strengths
++- **Clear Problem Statement**: The SOW document clearly identifies late diagnosis of chronic diseases (particularly diabetes and lifestyle-related diseases) as a real-world problem
++- **Well-Defined Stakeholders**: Healthcare professionals, wellness centers, and individuals seeking early health awareness are explicitly identified
++- **Business Goals Documented**: 
++  - Early disease risk identification
++  - Support for preventive healthcare
++  - Reduction of treatment costs
++  - Promotion of healthier lifestyles
++- **Data Mining Functionality**: Multi-class classification using ensemble methods (Random Forest, Histogram Gradient Boosting)
++
++#### ⚠️ Areas for Improvement
++- **Model Justification**: While the code implements Random Forest and HistGradientBoosting, the SOW mentions Decision Trees and ANNs. No comparison with alternatives (SVM, XGBoost, Neural Networks) is provided
++- **Missing Documentation**: No detailed explanation of WHY these specific algorithms were chosen over others
++- **Limited Alternative Solutions**: No discussion of alternative approaches (e.g., risk stratification vs binary classification, deep learning approaches)
++
++#### 📊 Alignment Score: **65-70%**
++The project has identified business goals and functionalities but lacks comprehensive justification and alternative solution discussions.
++
++---
++
++## 2. Data Selection, Preparation & Preprocessing [20%]
++
++### Requirements (from Marking Grid)
++- Very well-planned techniques and methods applied
++- Justification of preprocessing choices
++- Discussion of alternative techniques
++
++### Current Project Status
++
++#### ✅ Strengths
++- **Proper Data Cleaning**: 
++  - Duplicate removal (preprocess.py:33)
++  - Outlier handling with realistic constraints (Age clipped to 0-120)
++  - Text normalization using `.str.strip().str.capitalize()`
++- **Handling Missing Values**: 
++  - Explicit NaN replacement for text fields (preprocess.py:58)
++  - Imputation strategy in training pipeline (SimpleImputer with median/mode)
++- **Feature Engineering**:
++  - BMI category derived from height/weight in UI
++  - Symptom encoding (binary Yes/No)
++- **Preprocessing Pipeline**:
++  - Proper use of sklearn ColumnTransformer (train.py:64-69)
++  - Separate pipelines for numeric (scaling) and categorical (one-hot encoding) features
++  - StandardScaler for numeric normalization
++
++#### ⚠️ Areas for Improvement
++- **No Feature Selection**: No analysis of feature importance or correlation
++- **Limited Documentation**: No explanation of WHY certain columns were dropped (e.g., Risk_Score, Severity_Cat)
++- **Missing Techniques**:
++  - No handling of class imbalance (though `class_weight="balanced"` is used in RF)
++  - No outlier detection for other numeric columns besides Age
++  - No encoding strategy comparison (One-Hot vs Label vs Target encoding)
++- **No Alternative Discussion**: No mention of other preprocessing approaches (PCA, feature selection methods, SMOTE for imbalance)
++- **Data Quality Report Missing**: No statistics on missing value percentages, distribution analysis
++
++#### 📊 Alignment Score: **70-75%**
++Good practical implementation but lacks comprehensive documentation and justification of choices.
++
++---
++
++## 3. Building and Evaluating Models [20%]
++
++### Requirements (from Marking Grid)
++- Perfect solution with fine-tuning
++- Justifications presented
++- Alternative techniques discussed
++
++### Current Project Status
++
++#### ✅ Strengths
++- **Multiple Models Tested**: Random Forest and HistGradientBoosting (train.py:74-79)
++- **Proper Evaluation Metrics**: 
++  - Accuracy score
++  - Classification report (precision, recall, F1-score for each class)
++- **Best Model Selection**: Automatically saves the best performing model (train.py:99-101)
++- **Stratified Splitting**: Uses stratification to maintain class distribution (train.py:45)
++- **Balanced Classes**: RandomForest uses `class_weight="balanced"` to handle potential imbalance
++
++#### ⚠️ Areas for Improvement
++- **No Hyperparameter Tuning**: Models use default or hardcoded parameters (e.g., `n_estimators=300`)
++  - No GridSearchCV or RandomizedSearchCV
++  - No cross-validation for robust performance estimation
++- **Limited Model Comparison**: Only 2 models tested (SOW mentioned ANN but not implemented)
++- **Incomplete Evaluation**:
++  - No confusion matrix visualization
++  - No ROC curves or AUC scores for multi-class
++  - No feature importance analysis
++  - No error analysis or misclassification investigation
++- **No Justification**: No explanation of model selection rationale or performance comparison discussion
++- **Missing Documentation**:
++  - No model performance documentation (what accuracy was achieved?)
++  - No discussion of overfitting/underfitting
++  - No validation set evaluation
++
++#### 📊 Alignment Score: **60-65%**
++Basic model implementation with evaluation but lacks fine-tuning, comprehensive analysis, and justification.
++
++---
++
++## 4. Deploying Product & Client Application [20%]
++
++### Requirements (from Marking Grid)
++- Correct solution modeling the problem domain within stated constraints
++- Demonstrates full understanding of interface principles
++- Perfect interfaces demonstrating data flow
++
++### Current Project Status
++
++#### ✅ Strengths
++- **Functional UI Deployed**: Streamlit application (UI/app.py) provides user-friendly interface
++- **Comprehensive Input Fields**: 
++  - Demographics (Age, Gender, Ethnicity)
++  - Lifestyle factors (Smoking, Alcohol, Diet, Physical Activity)
++  - Symptoms (Generic + Special symptoms)
++  - Medical history (Medications, Pre-existing conditions)
++- **Input Validation**: 
++  - Min/max constraints on numeric inputs (Age: 0-120, Height: 50-250)
++  - Dropdown selections to prevent invalid inputs
++- **BMI Calculation**: Real-time BMI computation with category classification (app.py:47-57)
++- **User Feedback**: 
++  - Success/error messages
++  - Confidence scores displayed (app.py:126-129)
++  - Specialist recommendations based on disease (app.py:132-141)
++- **Clean Architecture**: Separation of concerns (Preprocess, Train, UI folders)
++
++#### ⚠️ Areas for Improvement
++- **No Cloud Deployment**: 
++  - Application runs only locally
++  - No deployment to Streamlit Cloud/Heroku/AWS/Azure
++  - SOW mentions deployment link should be on report cover page
++  - Missing deployment configuration files (e.g., Procfile, requirements for cloud platform)
++- **No Backend API**: Direct model loading in UI (not scalable for production)
++  - No Flask/FastAPI REST API layer
++  - No separation between frontend and model serving
++- **Missing Advanced Features**:
++  - No user authentication
++  - No prediction history storage
++  - No data persistence (database)
++  - No batch prediction capability
++  - No model versioning or monitoring
++- **UI Enhancements Possible**:
++  - Could add custom CSS styling beyond basic Streamlit theme
++  - No visualizations of prediction probabilities for all classes
++  - No explanation of predictions (SHAP values, feature contributions)
++  - Limited error handling (generic exception catch)
++- **Documentation**: No API documentation or user manual in codebase
++
++#### 📊 Alignment Score: **65-70%**
++Functional, well-designed UI with good input handling and user experience. Ready for local deployment but lacks cloud deployment which is a key requirement.
++
++---
++
++## 5. Documentation & Demonstration [20%]
++
++### Requirements (from Marking Grid)
++- Comprehensive documentation with all necessary features
++- Clear arguments presented
++- Perfect documentation approaching perfection
++
++### Current Project Status
++
++#### ✅ Strengths
++- **SOW Document Complete**: All required sections present
++  - Background with statistics and problem context
++  - Scope of work with 5 defined layers
++  - Activities, Approach, Deliverables clearly listed
++  - Project plan with Gantt chart
++  - Team roles and responsibilities defined
++- **README Exists**: Basic documentation with structure and run instructions (README.md)
++- **System Diagram**: Preprocessing and training flow visualized in README
++- **AGENTS.md**: Clear coding conventions documented for future reference
++- **Code Comments**: Logical sections separated with header comments
++
++#### ⚠️ Areas for Improvement
++- **Incomplete README**:
++  - No description of preprocessing techniques in detail
++  - Project structure section incomplete (line 77)
++  - No troubleshooting guide
++  - No dataset description or statistics
++- **Missing In-Code Documentation**:
++  - No model performance documentation in codebase
++  - No data exploration notebooks or analysis
++  - No user manual or deployment guide in README
++- **Limited Code Documentation**:
++  - No docstrings in functions
++  - No inline comments explaining complex logic
++  - No type hints (though project doesn't use them per convention)
++- **No Demonstration Materials in Codebase**:
++  - No example predictions or test cases documented
++  - No screenshots of UI in action
++  - No error scenarios documented
++- **Dataset Requirements**: 
++  - SOW mentions 12,000 records, but actual dataset size not verified in code/README
++  - No dataset exploration or EDA documentation
++
++#### 📊 Alignment Score: **70-75%**
++Good foundational documentation with complete SOW. Code documentation could be enhanced with more detailed explanations and examples.
++
++**Note**: Final report, video presentation, and deployment link are separate deliverables outside the codebase and should be evaluated independently during submission.
++
++---
++
++## Summary & Recommendations
++
++### Overall Alignment Scores by Category
++
++| Category | Score | Status |
++|----------|-------|--------|
++| 1. Problem Definition & Business Goals | 65-70% | 🟡 Moderate |
++| 2. Data Preprocessing | 70-75% | 🟡 Good |
++| 3. Model Building & Evaluation | 60-65% | 🟡 Moderate |
++| 4. Product Deployment | 65-70% | 🟡 Moderate |
++| 5. Documentation (Codebase) | 70-75% | 🟡 Good |
++
++### **Average Codebase Alignment: ~66-71%**
++
++**Note**: Final report and video presentation are separate deliverables evaluated outside this codebase analysis.
++
++---
++
++## Critical Missing Elements (Within Codebase)
++
++### 🔴 High Priority (Core Functionality)
++1. **Cloud Deployment** - Deploy to Streamlit Cloud/Heroku/AWS and provide deployment link
++2. **Model Justification Documentation** - Add detailed comparison and selection rationale in README or separate markdown file
++3. **Hyperparameter Tuning** - GridSearchCV/RandomizedSearchCV implementation
++4. **Cross-Validation** - K-fold validation for robust evaluation
++5. **Model Performance Visualization** - Confusion matrix, ROC curves, feature importance
++
++### 🟡 Medium Priority (Enhanced Analysis)
++6. **Alternative Solutions Discussion** - Compare with 2-3 other approaches in documentation
++7. **Dataset Verification** - Add script to verify 10,000+ rows requirement and document in README
++8. **EDA Documentation** - Add data exploration analysis (notebook or markdown)
++9. **Complete README** - Fill in missing sections (project structure, dataset description)
++10. **Deployment Configuration** - Add necessary files for cloud deployment (Procfile, runtime.txt, etc.)
++
++### 🟢 Low Priority (Enhancements)
++11. **API Layer** - Flask/FastAPI backend for better separation of concerns
++12. **Advanced UI** - Custom CSS, better visualizations
++13. **Prediction Explanations** - SHAP/LIME for interpretability
++14. **Code Documentation** - Add docstrings to all functions
++
++### 📦 Separate Deliverables (Not in Codebase)
++These are evaluated independently during final submission:
++- **Final Report** - Complete project report following template (submitted separately)
++- **Video Presentation** - 10-minute demonstration video (submitted separately)
++
++---
++
++## Dataset Requirement Check
++
++### From Instructions:
++> "Ensure datasets comprise at least **10,000 rows** with recent data and can be applied with **preprocessing**"
++
++### Current Status:
++- ✅ Preprocessing applied and well-documented
++- ❓ **Row count not verified in documentation**
++- ❓ Data recency not documented
++
++**Action Required**: Verify and document dataset size in README/report.
++
++---
++
++## Submission Checklist (from Final Submission Guidelines)
++
++| Item | Status | Location/Notes |
++|------|--------|----------------|
++| **Codebase Items** | | |
++| Source Code (.py format) | ✅ Present | Preprocess/, Train/, UI/ |
++| README with instructions | ✅ Present | Root directory (needs completion) |
++| Data preprocessing scripts | ✅ Present | Preprocess/preprocess.py |
++| Model training scripts | ✅ Present | Train/train.py |
++| UI application | ✅ Present | UI/app.py |
++| Requirements file | ✅ Present | requirements.txt |
++| SOW document | ✅ Present | Docs/SOW-FDM_MLB_G06.md |
++| Cloud deployment | ❌ Missing | Need to deploy and provide URL |
++| Deployment config files | ❌ Missing | Procfile, runtime.txt, etc. |
++| **Separate Deliverables** | | |
++| Final Report | ⚠️ External | To be submitted in submission folder |
++| Video Presentation | ⚠️ External | To be submitted (10 minutes) |
++| Repository Link | ⚠️ External | To be included on report cover page |
++| Deployment Link | ⚠️ See above | Part of codebase (should be deployed) |
++
++---
++
++## Recommendations for Improvement
++
++### Within Codebase - To Reach 75-80% (Good)
++1. **Deploy to cloud platform** (Streamlit Cloud/Heroku/AWS) - HIGH PRIORITY
++2. Add deployment configuration files (Procfile, runtime.txt if needed)
++3. Add model justification documentation (markdown file comparing algorithms)
++4. Implement hyperparameter tuning with GridSearchCV
++5. Add confusion matrix and performance visualizations
++6. Create EDA notebook/markdown with dataset analysis
++7. Complete README (project structure, dataset description, troubleshooting)
++
++### Within Codebase - To Reach 80-90% (Excellent)
++8. Implement cross-validation for robust evaluation
++9. Compare with 3+ alternative models (SVM, XGBoost, ANN) with documented results
++10. Add ROC curve and multi-class evaluation metrics
++11. Add feature importance analysis and visualization
++12. Implement SHAP/LIME for model explainability
++13. Create API backend layer (Flask/FastAPI)
++14. Add docstrings to functions
++
++### Within Codebase - To Reach 90-100% (Perfect)
++15. Advanced preprocessing with feature selection (documented and justified)
++16. Ensemble of multiple models with voting/stacking
++17. Interactive visualizations in UI (prediction probabilities, feature contributions)
++18. Comprehensive error handling and logging
++19. Model versioning system
++20. Unit tests for preprocessing and prediction functions
++
++### Separate Deliverables (To Complete Before Submission)
++- **Final Report**: Write comprehensive report following provided template
++- **Video Presentation**: Record 10-minute demo showing all features and results
++
++---
++
++## Conclusion
++
++The **codebase demonstrates solid foundational work** with functional preprocessing, model training, and UI implementation. The code quality is good with proper structure and follows established conventions.
++
++### Codebase Alignment: **66-71%**
++
++**Key Codebase Strengths:**
++- Clean, well-structured code following conventions
++- Proper preprocessing pipeline with sklearn
++- Functional Streamlit UI with good UX and input validation
++- Complete SOW document with clear problem definition
++- Separation of concerns (Preprocess, Train, UI modules)
++
++**Key Codebase Gaps:**
++- **No cloud deployment** (critical requirement)
++- No hyperparameter tuning or cross-validation
++- Limited model comparison (only 2 algorithms tested)
++- Insufficient model evaluation depth (no confusion matrix, ROC curves, feature importance)
++- Missing alternative solution discussions in documentation
++- Incomplete README sections
++- No docstrings or detailed code documentation
++
++**Priority Actions for Codebase:**
++1. **Deploy application to cloud platform** (Streamlit Cloud/Heroku/AWS) - HIGHEST PRIORITY
++2. Implement hyperparameter tuning (GridSearchCV)
++3. Add model performance visualizations (confusion matrix, ROC curves)
++4. Create model justification document comparing algorithms
++5. Complete README with dataset description and full project structure
++6. Add EDA documentation showing dataset analysis
++
++**Separate Deliverables to Complete:**
++- Write comprehensive final report using provided template
++- Record 10-minute video demonstration showing functionality and results
++
++By addressing the codebase gaps (especially cloud deployment) and completing the separate deliverables, the project can achieve a strong overall grade in the 75-85% range.
