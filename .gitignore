@@ -17,8 +17,7 @@ venv/
 .DS_Store
 Thumbs.db
 
-# Models & datasets (large files - optional)
-*.joblib
+
 
 
 # Temporary files
