@@ -624,7 +624,7 @@ input_dict = {
     "Duration_Days": [duration_days],
     "Current_Medications": [current_medications if current_medications else np.nan],
     "Pre_existing_Conditions": [pre_existing_conditions if pre_existing_conditions else np.nan],
-    "BMI_Category": [bmi_category if bmi_category else np.nan],
+    "BMI_Value": [bmi_value if bmi_value else np.nan],
 }
 
 df_input = pd.DataFrame(input_dict)
