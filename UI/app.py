@@ -40,21 +40,30 @@ diet = st.selectbox("Diet Habits", ["Healthy", "Processed Food", "High Sugar", "
 activity = st.selectbox("Physical Activity", ["Low", "Moderate", "High"])
 
 # Height & Weight for BMI calculation
+# height = st.number_input("Height (cm)", min_value=50, max_value=250, step=1)
+# weight = st.number_input("Weight (kg)", min_value=10, max_value=300, step=1)
+
+# bmi_category = None
+# if height > 0 and weight > 0:
+#     bmi = weight / ((height / 100) ** 2)
+#     if bmi < 18.5:
+#         bmi_category = "Underweight"
+#     elif 18.5 <= bmi < 25:
+#         bmi_category = "Normal"
+#     elif 25 <= bmi < 30:
+#         bmi_category = "Overweight"
+#     else:
+#         bmi_category = "Obese"
+#     st.write(f"**BMI:** {bmi:.2f} → {bmi_category}")
+
+# BMI calculation
 height = st.number_input("Height (cm)", min_value=50, max_value=250, step=1)
 weight = st.number_input("Weight (kg)", min_value=10, max_value=300, step=1)
 
-bmi_category = None
+bmi_value = None
 if height > 0 and weight > 0:
-    bmi = weight / ((height / 100) ** 2)
-    if bmi < 18.5:
-        bmi_category = "Underweight"
-    elif 18.5 <= bmi < 25:
-        bmi_category = "Normal"
-    elif 25 <= bmi < 30:
-        bmi_category = "Overweight"
-    else:
-        bmi_category = "Obese"
-    st.write(f"**BMI:** {bmi:.2f} → {bmi_category}")
+    bmi_value = weight / ((height / 100) ** 2)
+    st.write(f"*BMI:* {bmi_value:.2f}")
 
 # Generic Symptoms
 symptoms = st.multiselect(
@@ -105,7 +114,7 @@ input_dict = {
     "Duration_Days": [duration_days],
     "Current_Medications": [current_medications if current_medications else np.nan],
     "Pre_existing_Conditions": [pre_existing_conditions if pre_existing_conditions else np.nan],
-    "BMI_Category": [bmi_category if bmi_category else np.nan],
+    "BMI_Value": [bmi_value if bmi_value else np.nan],
 }
 
 df_input = pd.DataFrame(input_dict)

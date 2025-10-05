@@ -6,8 +6,12 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier, HistGradientBoostingClassifier
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.impute import SimpleImputer
+
+# XGBoost (make sure to install: pip install xgboost)
+from xgboost import XGBClassifier
 
 # -------------------------------
 # Paths
@@ -69,6 +73,36 @@ preprocessor = ColumnTransformer(
 )
 
 # -------------------------------
+# Save Preprocessed Dataset
+# -------------------------------
+print("\n🔄 Saving preprocessed dataset...")
+
+# Fit the preprocessor on the full dataset (X)
+X_preprocessed = preprocessor.fit_transform(X)
+
+# Get transformed column names
+cat_features = []
+if categorical_cols:
+    cat_encoder = preprocessor.named_transformers_["cat"].named_steps["onehot"]
+    cat_features = cat_encoder.get_feature_names_out(categorical_cols).tolist()
+
+all_features = numeric_cols + cat_features
+
+# Convert to DataFrame
+X_preprocessed_df = pd.DataFrame(X_preprocessed, columns=all_features)
+
+# Add target back
+X_preprocessed_df[TARGET] = y_encoded
+
+# Ensure Data folder exists
+os.makedirs("Data", exist_ok=True)
+
+# Save to CSV
+NEW_DATA_PATH = os.path.join("Data", "new_preprocessed.csv")
+X_preprocessed_df.to_csv(NEW_DATA_PATH, index=False)
+print(f"✅ Preprocessed dataset saved at: {NEW_DATA_PATH}")
+
+# -------------------------------
 # Models
 # -------------------------------
 models = {
@@ -76,6 +110,19 @@ models = {
         n_estimators=300, random_state=42, class_weight="balanced"
     ),
     "HistGradientBoosting": HistGradientBoostingClassifier(random_state=42),
+    "DecisionTree": DecisionTreeClassifier(
+        max_depth=None, random_state=42, class_weight="balanced"
+    ),
+    "XGBoost": XGBClassifier(
+        n_estimators=300,
+        learning_rate=0.1,
+        max_depth=6,
+        subsample=0.8,
+        colsample_bytree=0.8,
+        random_state=42,
+        eval_metric="mlogloss",
+        use_label_encoder=False
+    )
 }
 
 best_model = None
@@ -104,4 +151,4 @@ for name, model in models.items():
 # Save best model
 # -------------------------------
 joblib.dump(best_model, MODEL_PATH)
-print(f"\n Best model saved: {MODEL_PATH} with accuracy {best_acc:.4f}")
+print(f"\n✅ Best model saved: {MODEL_PATH}  with accuracy {best_acc:.4f}")

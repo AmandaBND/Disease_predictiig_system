@@ -1,9 +1,9 @@
 Record_ID,Record_Date,Age,Gender,Ethnicity,Living_Area,Family_History,Smoking,Alcohol,Diet_Habits,Physical_Activity,Pre_existing_Conditions,Current_Medications,Symptom_Cough,Symptom_Fever,Symptom_ChestPain,Symptom_Fatigue,Special_Symptom_1,Special_Symptom_2,Special_Symptom_3,Symptom_Duration,Symptom_Severity,Duration_Days,Total_Symptoms,Risk_Score_0_10,BMI_Category,Disease,Specialist
-1,21/10/2024,68,Male,Caucasian,Rural,Yes,Daily,Social,HEALTHY,Moderate,Obesity,Inhaler,Yes,No,Yes,No,Coughing at night,Shortness of breath,Rapid breathing,1 week,Mild,7,2,7.79,Overweight,Asthma,Pulmonologist
-2,07/11/2024,14,Male,Other,Urban,Yes,No,Frequent,Balanced  ,Low,Asthma,Metformin,Yes,Yes,No,No,,,,1+ month,Moderate,30,2,4.03,Normal,Hypertension,Cardiologist
-3,08/09/2024,71,Male,Asian,Rural,No,No,No,Processd Food,Moderate,Diabetes,Metformin,Yes,Yes,No,Yes,,,,1+ month,Moderate,30,3,7.11,Overweight,Asthma,Pulmonologist
+1,21/10/2024,68,male,Caucasian,Rural,Yes,Daily,Social,HEALTHY,Moderate,Obesity,Inhaler,Yes,No,Yes,No,Coughing at night,Shortness of breath,Rapid breathing,1 week,Mild,7,2,7.79,Overweight,Asthma,Pulmonologist
+2,07/11/2024,14,male,Other,Urban,Yes,No,Frequent,balanced  ,Low,Asthma,Metformin,Yes,Yes,No,No,,,,1+ month,Moderate,30,2,4.03,Normal,Hypertension,Cardiologist
+3,08/09/2024,71,Male,Asian,Rural,No,No,No,processd food,Moderate,Diabetes,Metformin,Yes,Yes,No,Yes,,,,1+ month,Moderate,30,3,7.11,Overweight,Asthma,Pulmonologist
 4,28/01/2024,80,Male,Caucasian,Urban,Yes,No,No,HEALTHY,Moderate,Diabetes,Beta-blocker,No,No,No,Yes,Joint pain,Daytime fatigue,Excessive sweating,1 week,Moderate,7,1,6.44,Obese,Obesity,Nutritionist
-5,08/11/2023,16,Female,African American,Rural,Yes,No,Social,Processd Food,High,Hypertension,Beta-blocker,No,Yes,No,No,,,,1 week,Mild,7,1,2.28,Normal,Influenza,General Practitioner
+5,08/11/2023,16,female,African American,Rural,Yes,No,Social,Processd Food,High,Hypertension,Beta-blocker,No,Yes,No,No,,,,1 week,Mild,7,1,2.28,Normal,Influenza,General Practitioner
 6,17/04/2021,74,Female,Hispanic,Rural,No,No,Social,High sugar,High,None,Insulin,Yes,No,No,No,Blurred vision,Tingling in hands/feet,Increased hunger,1 week,Moderate,7,1,5.44,Normal,Diabetes,Endocrinologist
 7,22/02/2024,90,Female,African American,Rural,No,No,No,Balanced  ,Low,Asthma,Metformin,No,Yes,No,No,,,,2+ weeks,Severe,14,1,7.32,Obese,Influenza,General Practitioner
 8,23/05/2024,14,Male,Caucasian,Urban,No,No,Frequent,HEALTHY,Low,Hypertension,None,No,No,Yes,No,Joint pain,Daytime fatigue,Back pain,1+ month,Moderate,30,1,3.69,Overweight,Obesity,Nutritionist
