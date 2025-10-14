@@ -4,9 +4,9 @@ import joblib
 import numpy as np
 import os
 
-# -------------------------------
+
 # Paths
-# -------------------------------
+
 MODEL_PATH = os.path.join("Train", "best_model.joblib")
 ENCODER_PATH = os.path.join("Train", "label_encoder.joblib")
 
@@ -16,9 +16,9 @@ label_encoder = joblib.load(ENCODER_PATH)
 
 st.set_page_config(page_title="Disease Prediction System", page_icon="🩺", layout="wide")
 
-# -------------------------------
+
 # Sidebar
-# -------------------------------
+
 with st.sidebar:
     st.markdown("### ℹ️ About")
     st.markdown("""
@@ -423,15 +423,15 @@ st.markdown("""
 
 st.write("")
 
-# -------------------------------
+
 # Progress Tracking
-# -------------------------------
+
 if 'form_progress' not in st.session_state:
     st.session_state.form_progress = 0
 
-# -------------------------------
+
 # User Inputs with Tabs
-# -------------------------------
+
 
 tab1, tab2, tab3, tab4 = st.tabs(["👤 Basic Info", "🚬 Lifestyle", "🩺 Symptoms", "📋 Medical History"])
 
@@ -570,9 +570,9 @@ with tab4:
         current_medications = st.text_input("💊 Current Medications (optional)", help="List any medications the patient is currently taking")
         pre_existing_conditions = st.text_input("🏥 Pre-existing Conditions (optional)", help="Any known chronic conditions or medical diagnoses")
 
-# -------------------------------
+
 # Build input dataframe & Calculate Progress
-# -------------------------------
+
 
 # Calculate form completion
 filled_fields = 0
@@ -629,9 +629,9 @@ input_dict = {
 
 df_input = pd.DataFrame(input_dict)
 
-# -------------------------------
+
 # Prediction
-# -------------------------------
+
 st.markdown('<div class="section-header">🔮 Prediction</div>', unsafe_allow_html=True)
 if st.button("🔮 Predict Disease"):
     with st.spinner("Analyzing patient data..."):
@@ -647,7 +647,7 @@ if st.button("🔮 Predict Disease"):
                 probs = model.predict_proba(df_input)[0]
                 confidence = round(max(probs) * 100, 2)
                 
-                st.markdown(f'<div class="prediction-card"><h3 style="margin:0;">Confidence Level: {confidence}%</h3></div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="prediction-card"><h6 style="margin:0;">Our system is {confidence}% conficence about your disease. <br> ⚠️ Disclaimer : System can make mistakes. Check important info.</h6></div>', unsafe_allow_html=True)
                 st.progress(confidence / 100)
 
                 disease_names = label_encoder.classes_
@@ -689,9 +689,9 @@ if st.button("🔮 Predict Disease"):
         except Exception as e:
             st.error(f"⚠️ Prediction failed: {e}")
 
-# -------------------------------
+
 # Footer
-# -------------------------------
+
 st.divider()
 col1, col2, col3 = st.columns(3)
 with col1:
